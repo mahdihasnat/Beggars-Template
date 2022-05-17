@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel}
+\usepackage[landscape,a4paper]{geometry}
+\geometry{top=0.7in,bottom=0.3in,left=0.2in,right=0.2in}
+\usepackage{amsmath}
+
+% \usepackage{color}   %May be necessary if you want to color links
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=false, %set true if you want colored links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+    linkcolor=blue,  %choose some color if you want links to stand out
+}
+
+\usepackage{multicol}
+\setlength{\columnseprule}{1pt}
+\def\columnseprulecolor{\color{black}}
+
+\usepackage[cache=true]{minted}
+\usemintedstyle{vs}
+\setminted{frame=bottomline,framesep=1mm,fontsize=\normalsize,tabsize=2,breaklines,baselinestretch=0.89}
+
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Page \thepage/\pageref{LastPage}}
+\lhead{BUET XYZ -- Bangladesh University of Engineering and Technology}
+
+
+\begin{document}
+\begin{multicols}{3}[]
+\begin{tableofcontents}
+\end{tableofcontents}
+
+\section{Sample 1}
+
+\subsection{Hello}
+
+\begin{minted}{cpp}
+// print hello world
+
+
+#include <iostream>
+
+int main()
+{
+    std::cout << "Hello, World!" << std::endl;
+    return 0;
+}
+\end{minted}
+
+
+\section{Sample 2}
+
+\subsection{Hello}
+
+\begin{minted}{python}
+# print hello world
+print("Hello World!")
+\end{minted}
+
+
+\end{multicols}
+\end{document}
