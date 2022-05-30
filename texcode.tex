@@ -34,33 +34,1347 @@
 \begin{tableofcontents}
 \end{tableofcontents}
 
-\section{Sample 1}
+\section{DP}
 
-\subsection{Hello}
+\subsection{DSU on Tree}
 
 \begin{minted}{cpp}
-// print hello world
+#include<bits/stdc++.h>
+#include<math.h>
+#include<vector>
+using namespace std;
+#define MAX 100005
+#define MOD 1000000007
+vector<int> *pvec[MAX];
+vector<int> Graph[MAX];
+int subtree[MAX];
+int color[MAX];
+int color_counter[MAX];
+pair<long long int,int> Info[MAX];
+int Subtree(int node,int parent=-1)
+{
+    subtree[node]=1;
+    int i;
+    for(i=0; i<Graph[node].size(); i++)
+    {
+        if(Graph[node][i]==parent) continue;
+        subtree[node]=subtree[node]+Subtree(Graph[node][i],node);
+    }
+    return subtree[node];
+}
+pair<long long int,int> dfs(int node,int parent=-1,bool keep=false)
+{
+    int i,j,k,child,hchild=-1;
+    for(i=0; i<Graph[node].size(); i++)
+    {
+        if(Graph[node][i]==parent) continue;
+        if(hchild==-1||subtree[hchild]<subtree[Graph[node][i]])
+        {
+            hchild=Graph[node][i];
+        }
+    }
+    for(i=0; i<Graph[node].size(); i++)
+    {
+        if(Graph[node][i]==parent||Graph[node][i]==hchild) continue;
+        dfs(Graph[node][i],node,false);
+    }
+    if(hchild!=-1)
+    {
+        Info[node]=dfs(hchild,node,true);
+        pvec[node]=pvec[hchild];
+    }
+    else
+    {
+        pvec[node]=new vector<int> ();
+    }
+    pvec[node]->push_back(node);
+    color_counter[color[node]]++;
+    if(color_counter[color[node]]>Info[node].second)
+    {
+        Info[node].second=color_counter[color[node]];
+        Info[node].first=color[node];
+    }
+    else if(color_counter[color[node]]==Info[node].second)
+    {
+        Info[node].first=Info[node].first+color[node];
+    }
+    for(i=0; i<Graph[node].size(); i++)
+    {
+        if(Graph[node][i]==parent||Graph[node][i]==hchild) continue;
+        child=Graph[node][i];
+        for(j=0; j<(*pvec[child]).size(); j++)
+        {
+            k=(*pvec[child])[j];
+            pvec[node]->push_back(k);
+            color_counter[color[k]]++;
+            if(color_counter[color[k]]>Info[node].second)
+            {
+                Info[node].second=color_counter[color[k]];
+                Info[node].first=color[k];
+            }
+            else if(color_counter[color[k]]==Info[node].second)
+            {
+                Info[node].first=Info[node].first+color[k];
+            }
+        }
+    }
+    if(!keep)
+    {
+        for(j=0; j<(*pvec[node]).size(); j++)
+        {
+            k=(*pvec[node])[j];
+            color_counter[color[k]]--;
+        }
+    }
+    return Info[node];
+}
+int main()
+{
+    int n,u,v,i;
+    scanf("%d",&n);
+    for(i=1; i<=n; i++)
+    {
+        scanf("%d",&color[i]);
+    }
+    for(i=1; i<n; i++)
+    {
+        scanf("%d %d",&u,&v);
+        Graph[u].push_back(v);
+        Graph[v].push_back(u);
+    }
+    Subtree(1);
+    dfs(1);
+    for(i=1; i<=n; i++)
+    {
+        printf("%I64d ",Info[i].first);
+    }
+    return 0;
+}
+
+\end{minted}
 
 
-#include <iostream>
+\subsection{Divide and Conquer Optimization}
+
+\begin{minted}{cpp}
+int m, n;
+vector<long long> dp_before(n), dp_cur(n);
+
+long long C(int i, int j);
+
+// compute dp_cur[l], ... dp_cur[r] (inclusive)
+void compute(int l, int r, int optl, int optr) {
+    if (l > r)
+        return;
+
+    int mid = (l + r) >> 1;
+    pair<long long, int> best = {LLONG_MAX, -1};
+
+    for (int k = optl; k <= min(mid, optr); k++) {
+        best = min(best, {(k ? dp_before[k - 1] : 0) + C(k, mid), k});
+    }
+
+    dp_cur[mid] = best.first;
+    int opt = best.second;
+
+    compute(l, mid - 1, optl, opt);
+    compute(mid + 1, r, opt, optr);
+}
+
+int solve() {
+    for (int i = 0; i < n; i++)
+        dp_before[i] = C(0, i);
+
+    for (int i = 1; i < m; i++) {
+        compute(0, n - 1, 0, n - 1);
+        dp_before = dp_cur;
+    }
+
+    return dp_before[n - 1];
+}
+
+\end{minted}
+
+
+\subsection{Li Chao Tree}
+
+\begin{minted}{cpp}
+#include <bits/stdc++.h>
+#include <vector>
+#include<math.h>
+#include<string.h>
+using namespace std;
+#define MAX 200005
+#define MOD 1000000007
+#define INF 10000000000
+#define EPS 0.0000000001
+#define FASTIO ios_base::sync_with_stdio(false);cin.tie(NULL)
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#include <ext/pb_ds/detail/standard_policies.hpp>
+class LiChaoTree
+{
+    long long L,R;
+    bool minimize;
+    int lines;
+    struct Node
+    {
+        complex<long long> line;
+        Node *children[2];
+        Node(complex<long long> ln= {0,1000000000000000000})
+        {
+            line=ln;
+            children[0]=0;
+            children[1]=0;
+        }
+    } *root;
+    long long dot(complex<long long> a, complex<long long> b)
+    {
+        return (conj(a) * b).real();
+    }
+    long long f(complex<long long> a,  long long x)
+    {
+        return dot(a, {x, 1});
+    }
+    void clear(Node* &node)
+    {
+        if(node->children[0])
+        {
+            clear(node->children[0]);
+        }
+        if(node->children[1])
+        {
+            clear(node->children[1]);
+        }
+        delete node;
+    }
+    void add_line(complex<long long> nw, Node* &node, long long l, long long r)
+    {
+        if(node==0)
+        {
+            node=new Node(nw);
+            return;
+        }
+        long long m = (l + r) / 2;
+        bool lef = (f(nw, l) < f(node->line, l)&&minimize)||((!minimize)&&f(nw, l) > f(node->line, l));
+        bool mid = (f(nw, m) < f(node->line, m)&&minimize)||((!minimize)&&f(nw, m) > f(node->line, m));
+        if(mid)
+        {
+            swap(node->line, nw);
+        }
+        if(r - l == 1)
+        {
+            return;
+        }
+        else if(lef != mid)
+        {
+            add_line(nw, node->children[0], l, m);
+        }
+        else
+        {
+            add_line(nw, node->children[1], m, r);
+        }
+    }
+    long long get(long long x, Node* &node, long long l, long long r)
+    {
+        long long m = (l + r) / 2;
+        if(r - l == 1)
+        {
+            return f(node->line, x);
+        }
+        else if(x < m)
+        {
+            if(node->children[0]==0) return f(node->line, x);
+            if(minimize) return min(f(node->line, x), get(x, node->children[0], l, m));
+            else return max(f(node->line, x), get(x, node->children[0], l, m));
+        }
+        else
+        {
+            if(node->children[1]==0) return f(node->line, x);
+            if(minimize) return min(f(node->line, x), get(x, node->children[1], m, r));
+            else return max(f(node->line, x), get(x, node->children[1], m, r));
+        }
+    }
+public:
+    LiChaoTree(long long l=-1000000001,long long r=1000000001,bool mn=false)
+    {
+        L=l;
+        R=r;
+        root=0;
+        minimize=mn;
+        lines=0;
+    }
+    void AddLine(pair<long long,long long> ln)
+    {
+        add_line({ln.first,ln.second},root,L,R);
+        lines++;
+    }
+    int number_of_lines()
+    {
+        return lines;
+    }
+    long long getOptimumValue(long long x)
+    {
+        return get(x,root,L,R);
+    }
+    ~LiChaoTree()
+    {
+        if(root!=0) clear(root);
+    }
+};
+int main()
+{
+    return 0;
+}
+
+\end{minted}
+
+
+\section{DS}
+
+\subsection{CD-anikda}
+
+\begin{minted}{cpp}
+// p[u] = parent of u in centroid tree
+// d[x][u] = distance from u to a parent of u at level x of centroid tree
+//           if u is in subtree of centroid c, then d[lvl[c]][u] = dist(c, l)
+// Taken from Rezwan Arefin
+// If (x, y) edge exist, then x must be in adj[y] and y must be in adj[x]
+const int maxn = 1e5 + 10; 
+vector<int> adj[maxn]; 
+int lvl[maxn], sub[maxn], p[maxn], vis[maxn], d[18][maxn], ans[maxn];
+	
+void calc(int u, int par) { sub[u] = 1; 
+	for(int v : adj[u]) if(v - par && !vis[v]) 
+		calc(v, u), sub[u] += sub[v];
+}
+int centroid(int u, int par, int r) {
+	for(int v : adj[u]) if(v - par && !vis[v]) 
+		if(sub[v] > r) return centroid(v, u, r);
+	return u;
+}
+void dfs(int l, int u, int par) {
+	if(par + 1) d[l][u] = d[l][par] + 1; 
+	for(int v : adj[u]) if(v - par && !vis[v]) 
+		dfs(l, v, u);
+}
+void decompose(int u, int par) {
+	calc(u, -1);
+	int c = centroid(u, -1, sub[u] >> 1);
+	vis[c] = 1, p[c] = par, lvl[c] = 0; 
+	if(par + 1) lvl[c] = lvl[par] + 1;
+	dfs(lvl[c], c, -1);
+	for(int v : adj[c]) if(v - par && !vis[v]) 
+		decompose(v, c);
+}
+
+void update(int u) {
+	for(int v = u; v + 1; v = p[v]) 
+		ans[v] = min(ans[v], d[lvl[v]][u]);
+}
+int query(int u) {
+	int ret = 1e9;
+	for(int v = u; v + 1; v = p[v])
+		ret = min(ret, ans[v] + d[lvl[v]][u]);
+	return ret;
+}
+
+\end{minted}
+
+
+\subsection{HLD-anikda}
+
+\begin{minted}{cpp}
+LazySegmentTree Tree ; 
+int sz[MAX];
+int in[MAX];
+int rin[MAX];
+int out[MAX];
+int head[MAX];
+int par[MAX];
+vector<int>g[MAX];
+void dfs_sz(int u,int p) {
+    sz[u] = 1;
+    par[u] = p;
+    for(auto &v: g[u]) {
+        if(v==p)continue;
+        dfs_sz(v,u);
+        sz[u] += sz[v];
+        if(sz[v] > sz[g[u][0]])
+            swap(v,g[u][0]);
+    }
+}
+int t;
+void dfs_hld(int u,int p) {
+    in[u] = ++t;
+    rin[in[u]] = u;
+    for(auto v: g[u]) {
+        if(v==p)continue;
+        head[v] = (v == g[u][0] ? head[u] : v);
+        dfs_hld(v,u);
+    }
+    out[u] = t;
+}
+bool isParent(int p,int u){
+    return in[p]<=in[u]&&out[u]<=out[p];
+}
+int n ;
+int pathQuery(int u,int v){
+    int ret = -inf;
+    while(true){
+        if(isParent(head[u],v))break;
+        ret=max(ret,Tree.queryRange(1,1,n,in[head[u]],in[u]));
+        u=par[head[u]];
+    }
+    swap(u,v);
+    while(true){
+        if(isParent(head[u],v))break;
+        ret=max(ret,Tree.queryRange(1,1,n,in[head[u]],in[u]));
+        u=par[head[u]];
+    }
+    if(in[v]<in[u])swap(u,v);
+    ret = max(ret,Tree.queryRange(1,1,n,in[u],in[v]));
+    return ret;
+}
+void updateSubTree(int u,int val){
+    Tree.updateRange(1,1,n,in[u],out[u],val);
+}
+void buildHLD(int root){
+    dfs_sz(root,root);
+    head[root]=root;
+    dfs_hld(root,root);
+}
+// call buildHLD
+\end{minted}
+
+
+\subsection{Implicit Treap}
+
+\begin{minted}{cpp}
+#include<bits/stdc++.h>
+#include<math.h>
+#include<vector>
+#include<stdlib.h>
+using namespace std;
+#define MAX 200005
+#define MOD 998244353
+#define NINF -1000000000000000000
+template <class T>
+class implicit_treap
+{
+    struct item
+    {
+        int prior, cnt;
+        T value;
+        bool rev;
+        item *l,*r;
+        item(T v)
+        {
+            value=v;
+            rev=false;
+            l=NULL;
+            r=NULL;
+            cnt=1;
+            prior=rand();
+        }
+    } *root,*node;
+    int cnt (item * it)
+    {
+        return it ? it->cnt : 0;
+    }
+
+    void upd_cnt (item * it)
+    {
+        if (it)
+            it->cnt = cnt(it->l) + cnt(it->r) + 1;
+    }
+
+    void push (item * it)
+    {
+        if (it && it->rev)
+        {
+            it->rev = false;
+            swap (it->l, it->r);
+            if (it->l)  it->l->rev ^= true;
+            if (it->r)  it->r->rev ^= true;
+        }
+    }
+
+    void merge (item * & t, item * l, item * r)
+    {
+        push (l);
+        push (r);
+        if (!l || !r)
+            t = l ? l : r;
+        else if (l->prior > r->prior)
+            merge (l->r, l->r, r),  t = l;
+        else
+            merge (r->l, l, r->l),  t = r;
+        upd_cnt (t);
+    }
+
+    void split (item * t, item * & l, item * & r, int key, int add = 0)
+    {
+        if (!t)
+            return void( l = r = 0 );
+        push (t);
+        int cur_key = add + cnt(t->l);
+        if (key <= cur_key)
+            split (t->l, l, t->l, key, add),  r = t;
+        else
+            split (t->r, t->r, r, key, add + 1 + cnt(t->l)),  l = t;
+        upd_cnt (t);
+    }
+    void insert(item * &t,item * element,int key)
+    {
+        item *l,*r;
+        split(t,l,r,key);
+        merge(l,l,element);
+        merge(t,l,r);
+        l=NULL;
+        r=NULL;
+    }
+    T elementAt(item * &t,int key)
+    {
+        push(t);
+        T ans;
+        if(cnt(t->l)==key) ans=t->value;
+        else if(cnt(t->l)>key) ans=elementAt(t->l,key);
+        else ans=elementAt(t->r,key-1-cnt(t->l));
+        return ans;
+    }
+    void erase (item * & t, int key)
+    {
+        push(t);
+        if(!t) return;
+        if (key == cnt(t->l))
+            merge (t, t->l, t->r);
+        else if(key<cnt(t->l))
+            erase(t->l,key);
+        else
+            erase(t->r,key-cnt(t->l)-1);
+        upd_cnt(t);
+    }
+    void reverse (item * &t, int l, int r)
+    {
+        item *t1, *t2, *t3;
+        split (t, t1, t2, l);
+        split (t2, t2, t3, r-l+1);
+        t2->rev ^= true;
+        merge (t, t1, t2);
+        merge (t, t, t3);
+    }
+    void cyclic_shift(item * &t,int L,int R)
+    {
+        if(L==R) return;
+        item *l,*r,*m;
+        split(t,t,l,L);
+        split(l,l,m,R-L+1);
+        split(l,l,r,R-L);
+        merge(t,t,r);
+        merge(t,t,l);
+        merge(t,t,m);
+        l=NULL;
+        r=NULL;
+        m=NULL;
+    }
+    void output (item * t,vector<T> &arr)
+    {
+        if (!t)  return;
+        push (t);
+        output (t->l,arr);
+        arr.push_back(t->value);
+        output (t->r,arr);
+    }
+public:
+    implicit_treap()
+    {
+        root=NULL;
+    }
+    void insert(T value,int position)
+    {
+        node=new item(value);
+        insert(root,node,position);
+    }
+    void erase(int position)
+    {
+        erase(root,position);
+    }
+    void reverse(int l,int r)
+    {
+        reverse(root,l,r);
+    }
+    T elementAt(int position)
+    {
+        return elementAt(root,position);
+    }
+    void cyclic_shift(int L,int R)
+    {
+        cyclic_shift(root,L,R);
+    }
+    int size()
+    {
+        return cnt(root);
+    }
+    void output(vector<T> &arr)
+    {
+        output(root,arr);
+    }
+};
+
+\end{minted}
+
+
+\subsection{Mo Algorithm}
+
+\begin{minted}{cpp}
+#include<bits/stdc++.h>
+using namespace std;
+#define MOD 998244353
+#define MAX 200005
+#define MAX_BIT 50
+#define PRECISION 0.00000000001
+#define INF 2000000000
+void remove(int idx);  // TODO: remove value at idx from data structure
+void add(int idx);     // TODO: add value at idx from data structure
+int get_answer();  // TODO: extract the current answer of the data structure
+int block_size;
+struct Query {
+    int l, r,k, idx;
+    bool operator<(Query other) const
+    {
+        if(l/block_size!=other.l/block_size) return (l<other.l);
+        return (l/block_size&1)? (r<other.r) : (r>other.r);
+    }
+};
+vector<int> mo_s_algorithm(vector<Query> queries) {
+    vector<int> answers(queries.size());
+    sort(queries.begin(), queries.end());
+
+    // TODO: initialize data structure
+
+    int cur_l = 0;
+    int cur_r = -1;
+    // invariant: data structure will always reflect the range [cur_l, cur_r]
+    for (Query q : queries) {
+        while (cur_l > q.l) {
+            cur_l--;
+            add(cur_l);
+        }
+        while (cur_r < q.r) {
+            cur_r++;
+            add(cur_r);
+        }
+        while (cur_l < q.l) {
+            remove(cur_l);
+            cur_l++;
+        }
+        while (cur_r > q.r) {
+            remove(cur_r);
+            cur_r--;
+        }
+        answers[q.idx] = get_answer();
+    }
+    return answers;
+}
 
 int main()
 {
-    std::cout << "Hello, World!" << std::endl;
     return 0;
 }
+
 \end{minted}
 
 
-\section{Sample 2}
+\subsection{Treap}
 
-\subsection{Hello}
+\begin{minted}{cpp}
+#include<bits/stdc++.h>
+#include<math.h>
+#include<vector>
+#include<stdlib.h>
+using namespace std;
+#define MAX 400005
+#define MOD 998244353
+#define INF 2000000000
+template <class T>
+class treap
+{
+    struct item
+    {
+        int prior, cnt;
+        T key;
+        item *l,*r;
+        item(T v)
+        {
+            key=v;
+            l=NULL;
+            r=NULL;
+            cnt=1;
+            prior=rand();
+        }
+    } *root,*node;
+    int cnt (item * it)
+    {
+        return it ? it->cnt : 0;
+    }
 
-\begin{minted}{python}
-# print hello world
-print("Hello World!")
+    void upd_cnt (item * it)
+    {
+        if (it)
+            it->cnt = cnt(it->l) + cnt(it->r) + 1;
+    }
+
+    void split (item * t, T key, item * & l, item * & r)
+    {
+        if (!t)
+            l = r = NULL;
+        else if (key < t->key)
+            split (t->l, key, l, t->l),  r = t;
+        else
+            split (t->r, key, t->r, r),  l = t;
+        upd_cnt(t);
+    }
+
+    void insert (item * & t, item * it)
+    {
+        if (!t)
+            t = it;
+        else if (it->prior > t->prior)
+            split (t, it->key, it->l, it->r),  t = it;
+        else
+            insert (it->key < t->key ? t->l : t->r, it);
+        upd_cnt(t);
+    }
+
+    void merge (item * & t, item * l, item * r)
+    {
+        if (!l || !r)
+            t = l ? l : r;
+        else if (l->prior > r->prior)
+            merge (l->r, l->r, r),  t = l;
+        else
+            merge (r->l, l, r->l),  t = r;
+        upd_cnt(t);
+    }
+
+    void erase (item * & t, T key)
+    {
+        if (t->key == key)
+            merge (t, t->l, t->r);
+        else
+            erase (key < t->key ? t->l : t->r, key);
+        upd_cnt(t);
+    }
+
+    T elementAt(item * &t,int key)
+    {
+        T ans;
+        if(cnt(t->l)==key) ans=t->key;
+        else if(cnt(t->l)>key) ans=elementAt(t->l,key);
+        else ans=elementAt(t->r,key-1-cnt(t->l));
+        upd_cnt(t);
+        return ans;
+    }
+
+    item * unite (item * l, item * r)
+    {
+        if (!l || !r)  return l ? l : r;
+        if (l->prior < r->prior)  swap (l, r);
+        item * lt, * rt;
+        split (r, l->key, lt, rt);
+        l->l = unite (l->l, lt);
+        l->r = unite (l->r, rt);
+        upd_cnt(l);
+        upd_cnt(r);
+        return l;
+    }
+    void heapify (item * t)
+    {
+        if (!t) return;
+        item * max = t;
+        if (t->l != NULL && t->l->prior > max->prior)
+            max = t->l;
+        if (t->r != NULL && t->r->prior > max->prior)
+            max = t->r;
+        if (max != t)
+        {
+            swap (t->prior, max->prior);
+            heapify (max);
+        }
+    }
+
+    item * build (T * a, int n)
+    {
+        if (n == 0) return NULL;
+        int mid = n / 2;
+        item * t = new item (a[mid], rand ());
+        t->l = build (a, mid);
+        t->r = build (a + mid + 1, n - mid - 1);
+        heapify (t);
+        return t;
+    }
+    void output (item * t,vector<T> &arr)
+    {
+        if (!t)  return;
+        output (t->l,arr);
+        arr.push_back(t->key);
+        output (t->r,arr);
+    }
+public:
+    treap()
+    {
+        root=NULL;
+    }
+    treap(T *a,int n)
+    {
+        build(a,n);
+    }
+    void insert(T value)
+    {
+        node=new item(value);
+        insert(root,node);
+    }
+    void erase(T value)
+    {
+        erase(root,value);
+    }
+    T elementAt(int position)
+    {
+        return elementAt(root,position);
+    }
+    int size()
+    {
+        return cnt(root);
+    }
+    void output(vector<T> &arr)
+    {
+        output(root,arr);
+    }
+    int range_query(T l,T r) //(l,r]
+    {
+        item *previous,*next,*current;
+        split(root,l,previous,current);
+        split(current,r,current,next);
+        int ans=cnt(current);
+        merge(root,previous,current);
+        merge(root,root,next);
+        previous=NULL;
+        current=NULL;
+        next=NULL;
+        return ans;
+    }
+};
+
 \end{minted}
 
 
-\end{multicols}
-\end{document}
+\section{Flow}
+
+\subsection{Dinic's Algorithm}
+
+\begin{minted}{cpp}
+#include<bits/stdc++.h>
+#include<vector>
+using namespace std;
+#define MAX 100
+#define HUGE_FLOW 1000000000
+#define BEGIN 1
+#define DEFAULT_LEVEL 0
+struct FlowEdge {
+    int v, u;
+    long long cap, flow = 0;
+    FlowEdge(int v, int u, long long cap) : v(v), u(u), cap(cap) {}
+};
+
+struct Dinic {
+    const long long flow_inf = 1e18;
+    vector<FlowEdge> edges;
+    vector<vector<int>> adj;
+    int n, m = 0;
+    int s, t;
+    vector<int> level, ptr;
+    queue<int> q;
+
+    Dinic(int n, int s, int t) : n(n), s(s), t(t) {
+        adj.resize(n);
+        level.resize(n);
+        ptr.resize(n);
+    }
+
+    void add_edge(int v, int u, long long cap) {
+        edges.emplace_back(v, u, cap);
+        edges.emplace_back(u, v, 0);
+        adj[v].push_back(m);
+        adj[u].push_back(m + 1);
+        m += 2;
+    }
+
+    bool bfs() {
+        while (!q.empty()) {
+            int v = q.front();
+            q.pop();
+            for (int id : adj[v]) {
+                if (edges[id].cap - edges[id].flow < 1)
+                    continue;
+                if (level[edges[id].u] != -1)
+                    continue;
+                level[edges[id].u] = level[v] + 1;
+                q.push(edges[id].u);
+            }
+        }
+        return level[t] != -1;
+    }
+
+    long long dfs(int v, long long pushed) {
+        if (pushed == 0)
+            return 0;
+        if (v == t)
+            return pushed;
+        for (int& cid = ptr[v]; cid < (int)adj[v].size(); cid++) {
+            int id = adj[v][cid];
+            int u = edges[id].u;
+            if (level[v] + 1 != level[u] || edges[id].cap - edges[id].flow < 1)
+                continue;
+            long long tr = dfs(u, min(pushed, edges[id].cap - edges[id].flow));
+            if (tr == 0)
+                continue;
+            edges[id].flow += tr;
+            edges[id ^ 1].flow -= tr;
+            return tr;
+        }
+        return 0;
+    }
+
+    long long flow() {
+        long long f = 0;
+        while (true) {
+            fill(level.begin(), level.end(), -1);
+            level[s] = 0;
+            q.push(s);
+            if (!bfs())
+                break;
+            fill(ptr.begin(), ptr.end(), 0);
+            while (long long pushed = dfs(s, flow_inf)) {
+                f += pushed;
+            }
+        }
+        return f;
+    }
+};
+int main()
+{
+    return 0;
+}
+
+\end{minted}
+
+
+\subsection{Edmond's Blossom Algorithm}
+
+\begin{minted}{cpp}
+/***Copied from https://codeforces.com/blog/entry/49402***/
+
+/*
+GETS:
+V->number of vertices
+E->number of edges
+pair of vertices as edges (vertices are 1..V)
+
+GIVES:
+output of edmonds() is the maximum matching
+match[i] is matched pair of i (-1 if there isn't a matched pair)
+ */
+
+#include <bits/stdc++.h>
+using namespace std;
+const int M=500;
+struct struct_edge
+{
+    int v;
+    struct_edge* n;
+};
+typedef struct_edge* edge;
+struct_edge pool[M*M*2];
+edge top=pool,adj[M];
+int V,E,match[M],qh,qt,q[M],father[M],base[M];
+bool inq[M],inb[M],ed[M][M];
+void add_edge(int u,int v)
+{
+    top->v=v,top->n=adj[u],adj[u]=top++;
+    top->v=u,top->n=adj[v],adj[v]=top++;
+}
+int LCA(int root,int u,int v)
+{
+    static bool inp[M];
+    memset(inp,0,sizeof(inp));
+    while(1)
+    {
+        inp[u=base[u]]=true;
+        if (u==root) break;
+        u=father[match[u]];
+    }
+    while(1)
+    {
+        if (inp[v=base[v]]) return v;
+        else v=father[match[v]];
+    }
+}
+void mark_blossom(int lca,int u)
+{
+    while (base[u]!=lca)
+    {
+        int v=match[u];
+        inb[base[u]]=inb[base[v]]=true;
+        u=father[v];
+        if (base[u]!=lca) father[u]=v;
+    }
+}
+void blossom_contraction(int s,int u,int v)
+{
+    int lca=LCA(s,u,v);
+    memset(inb,0,sizeof(inb));
+    mark_blossom(lca,u);
+    mark_blossom(lca,v);
+    if (base[u]!=lca)
+        father[u]=v;
+    if (base[v]!=lca)
+        father[v]=u;
+    for (int u=0; u<V; u++)
+        if (inb[base[u]])
+        {
+            base[u]=lca;
+            if (!inq[u])
+                inq[q[++qt]=u]=true;
+        }
+}
+int find_augmenting_path(int s)
+{
+    memset(inq,0,sizeof(inq));
+    memset(father,-1,sizeof(father));
+    for (int i=0; i<V; i++) base[i]=i;
+    inq[q[qh=qt=0]=s]=true;
+    while (qh<=qt)
+    {
+        int u=q[qh++];
+        for (edge e=adj[u]; e; e=e->n)
+        {
+            int v=e->v;
+            if (base[u]!=base[v]&&match[u]!=v)
+                if ((v==s)||(match[v]!=-1 && father[match[v]]!=-1))
+                    blossom_contraction(s,u,v);
+                else if (father[v]==-1)
+                {
+                    father[v]=u;
+                    if (match[v]==-1)
+                        return v;
+                    else if (!inq[match[v]])
+                        inq[q[++qt]=match[v]]=true;
+                }
+        }
+    }
+    return -1;
+}
+int augment_path(int s,int t)
+{
+    int u=t,v,w;
+    while (u!=-1)
+    {
+        v=father[u];
+        w=match[v];
+        match[v]=u;
+        match[u]=v;
+        u=w;
+    }
+    return t!=-1;
+}
+int edmonds()
+{
+    int matchc=0;
+    memset(match,-1,sizeof(match));
+    for (int u=0; u<V; u++)
+        if (match[u]==-1)
+            matchc+=augment_path(u,find_augmenting_path(u));
+    return matchc;
+}
+int main()
+{
+    FILE *in=stdin;
+    int u,v;
+    fscanf(in,"%d",&V);
+    while(fscanf(in,"%d %d",&u,&v)!=EOF)
+    {
+
+        if (!ed[u-1][v-1])
+        {
+            add_edge(u-1,v-1);
+            ed[u-1][v-1]=ed[v-1][u-1]=true;
+        }
+    }
+    printf("%d\n",2*edmonds());
+    for (int i=0; i<V; i++)
+        if (i<match[i])
+            printf("%d %d\n",i+1,match[i]+1);
+    return 0;
+}
+
+\end{minted}
+
+
+\subsection{Hungarian Algorithm}
+
+\begin{minted}{cpp}
+#include <bits/stdc++.h>
+#include <vector>
+#include<math.h>
+#include<string.h>
+using namespace std;
+#define MAX 300005
+#define MOD 1000000007
+#define GMAX 19
+#define INF 20000000000000000
+#define EPS 0.000000001
+#define FASTIO ios_base::sync_with_stdio(false);cin.tie(NULL)
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#include <ext/pb_ds/detail/standard_policies.hpp>
+class HungarianAlgorithm
+{
+    int N,inf,n,max_match;
+    int *lx,*ly,*xy,*yx,*slack,*slackx,*prev;
+    int **cost;
+    bool *S,*T;
+    void init_labels()
+    {
+        for(int x=0;x<n;x++) lx[x]=0;
+        for(int y=0;y<n;y++) ly[y]=0;
+        for (int x = 0; x < n; x++)
+            for (int y = 0; y < n; y++)
+                lx[x] = max(lx[x], cost[x][y]);
+    }
+    void update_labels()
+    {
+        int x, y, delta = inf; //init delta as infinity
+        for (y = 0; y < n; y++) //calculate delta using slack
+            if (!T[y])
+                delta = min(delta, slack[y]);
+        for (x = 0; x < n; x++) //update X labels
+            if (S[x]) lx[x] -= delta;
+        for (y = 0; y < n; y++) //update Y labels
+            if (T[y]) ly[y] += delta;
+        for (y = 0; y < n; y++) //update slack array
+            if (!T[y])
+                slack[y] -= delta;
+    }
+    void add_to_tree(int x, int prevx)
+//x - current vertex,prevx - vertex from X before x in the alternating path,
+//so we add edges (prevx, xy[x]), (xy[x], x)
+    {
+        S[x] = true; //add x to S
+        prev[x] = prevx; //we need this when augmenting
+        for (int y = 0; y < n; y++) //update slacks, because we add new vertex to S
+            if (lx[x] + ly[y] - cost[x][y] < slack[y])
+            {
+                slack[y] = lx[x] + ly[y] - cost[x][y];
+                slackx[y] = x;
+            }
+    }
+    void augment() //main function of the algorithm
+    {
+        if (max_match == n) return; //check wether matching is already perfect
+        int x, y, root; //just counters and root vertex
+        int q[N], wr = 0, rd = 0; //q - queue for bfs, wr,rd - write and read
+//pos in queue
+        //memset(S, false, sizeof(S)); //init set S
+        for(int i=0;i<n;i++) S[i]=false;
+        //memset(T, false, sizeof(T)); //init set T
+        for(int i=0;i<n;i++) T[i]=false;
+        //memset(prev, -1, sizeof(prev)); //init set prev - for the alternating tree
+        for(int i=0;i<n;i++) prev[i]=-1;
+        for (x = 0; x < n; x++) //finding root of the tree
+        {
+            if (xy[x] == -1)
+            {
+                q[wr++] = root = x;
+                prev[x] = -2;
+                S[x] = true;
+                break;
+            }
+        }
+        for (y = 0; y < n; y++) //initializing slack array
+        {
+            slack[y] = lx[root] + ly[y] - cost[root][y];
+            slackx[y] = root;
+        }
+        while (true) //main cycle
+        {
+            while (rd < wr) //building tree with bfs cycle
+            {
+                x = q[rd++]; //current vertex from X part
+                for (y = 0; y < n; y++) //iterate through all edges in equality graph
+                {
+                    if (cost[x][y] == lx[x] + ly[y] && !T[y])
+                    {
+                        if (yx[y] == -1) break; //an exposed vertex in Y found, so
+//augmenting path exists!
+                        T[y] = true; //else just add y to T,
+                        q[wr++] = yx[y]; //add vertex yx[y], which is matched
+//with y, to the queue
+                        add_to_tree(yx[y], x); //add edges (x,y) and (y,yx[y]) to the tree
+                    }
+                }
+
+                if (y < n) break; //augmenting path found!
+            }
+            if (y < n) break; //augmenting path found!
+            update_labels(); //augmenting path not found, so improve labeling
+            wr = rd = 0;
+
+            for (y = 0; y < n; y++)
+            {
+                //in this cycle we add edges that were added to the equality graph as a
+//result of improving the labeling, we add edge (slackx[y], y) to the tree if
+//and only if !T[y] && slack[y] == 0, also with this edge we add another one
+//(y, yx[y]) or augment the matching, if y was exposed
+                if (!T[y] && slack[y] == 0)
+                {
+                    if (yx[y] == -1) //exposed vertex in Y found - augmenting path exists!
+                    {
+                        x = slackx[y];
+                        break;
+                    }
+                    else
+                    {
+                        T[y] = true; //else just add y to T,
+                        if (!S[yx[y]])
+                        {
+                            q[wr++] = yx[y]; //add vertex yx[y], which is matched with
+//y, to the queue
+                            add_to_tree(yx[y], slackx[y]); //and add edges (x,y) and (y,
+//yx[y]) to the tree
+                        }
+                    }
+                }
+            }
+            if (y < n) break; //augmenting path found!
+        }
+        if (y < n) //we found augmenting path!
+        {
+            max_match++; //increment matching
+//in this cycle we inverse edges along augmenting path
+            for (int cx = x, cy = y, ty; cx != -2; cx = prev[cx], cy = ty)
+            {
+                ty = xy[cx];
+                yx[cy] = cx;
+                xy[cx] = cy;
+            }
+            augment(); //recall function, go to step 1 of the algorithm
+        }
+    }//end of augment() function
+public:
+    HungarianAlgorithm(int vv,int inf=1000000000)
+    {
+        N=vv;
+        n=N;
+        max_match=0;
+        this->inf=inf;
+        lx=new int[N];
+        ly=new int[N];//labels of X and Y parts
+        xy=new int[N];//xy[x] - vertex that is matched with x,
+        yx=new int[N];//yx[y] - vertex that is matched with y
+        slack=new int[N];//as in the algorithm description
+        slackx=new int[N];//slackx[y] such a vertex, that l(slackx[y]) + l(y) - w(slackx[y],y) = slack[y]
+        prev=new int[N];//array for memorizing alternating paths
+        S=new bool[N];
+        T=new bool[N];//sets S and T in algorithm
+        cost=new int*[N];//cost matrix
+        for(int i=0; i<N; i++)
+        {
+            cost[i]=new int[N];
+        }
+    }
+    ~HungarianAlgorithm()
+    {
+        delete []lx;
+        delete []ly;
+        delete []xy;
+        delete []yx;
+        delete []slack;
+        delete []slackx;
+        delete []prev;
+        delete []S;
+        delete []T;
+        int i;
+        for(i=0; i<N; i++)
+        {
+            delete [](cost[i]);
+        }
+        delete []cost;
+    }
+    void setCost(int i,int j,int c)
+    {
+        cost[i][j]=c;
+    }
+    int* matching(bool first=true)
+    {
+        int *ans;
+        ans=new int[N];
+        for(int i=0;i<N;i++)
+        {
+            if(first) ans[i]=xy[i];
+            else ans[i]=yx[i];
+        }
+        return ans;
+    }
+    int hungarian()
+    {
+        int ret = 0; //weight of the optimal matching
+        max_match = 0; //number of vertices in current matching
+        for(int x=0;x<n;x++) xy[x]=-1;
+        for(int y=0;y<n;y++) yx[y]=-1;
+        init_labels(); //step 0
+        augment(); //steps 1-3
+        for (int x = 0; x < n; x++) //forming answer there
+            ret += cost[x][xy[x]];
+        return ret;
+    }
+};
+int main()
+{
+    int t,T=1;
+    scanf("%d",&T);
+    for(t=0;t<T;t++)
+    {
+        int n,i,j;
+        scanf("%d",&n);
+        HungarianAlgorithm h(n);
+        int own[n],opposite[n];
+        for(i=0;i<n;i++)
+        {
+            scanf("%d",&own[i]);
+        }
+        for(j=0;j<n;j++)
+        {
+            scanf("%d",&opposite[j]);
+        }
+        for(i=0;i<n;i++)
+        {
+            for(j=0;j<n;j++)
+            {
+                int v;
+                if(own[i]==opposite[j]) v=1;
+                else if(own[i]>opposite[j]) v=2;
+                else v=0;
+                h.setCost(i,j,v);
+            }
+        }
+        int ans=h.hungarian();
+        printf("Case %d: %d\n",t+1,ans);
+    }
+    return 0;
+}
+
+\end{minted}
+
+
+\subsection{Maximum Bipartite Matching}
