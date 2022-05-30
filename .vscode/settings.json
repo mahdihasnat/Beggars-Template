@@ -2,6 +2,12 @@
 	"files.associations": {
 		"*.asm": "muchassemblyrequired",
 		"*.txt": "plaintext",
-		"*.tcc": "cpp"
+		"*.tcc": "cpp",
+		"array": "cpp",
+		"any": "cpp",
+		"string_view": "cpp",
+		"regex": "cpp",
+		"hashing": "c",
+		"cmath": "c"
 	}
 }
