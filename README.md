@@ -27,6 +27,7 @@ Sparse Table
 Treap
 BIT
 Mo's Algorithm
+Mo's Algorithm with update
 Wavelet Tree
 Ordered Set
 2DBit - Topcoder
@@ -61,3 +62,13 @@ Discrete Math
 FFT
 Polynomial Algebra
 Linear Sieve
+
+
+Graph
+-----
+SCC
+
+
+Flow
+----
+note
