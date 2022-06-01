@@ -19,6 +19,6 @@
 
 example:
     ./bin/notebookgen -s 11 -c 3 -p a4paper -a "BUET Radiant" ./Compressed/
-    /bin/notebookgen -s 11 -c 3 -p a4paper -a "BUET Beggars" ./../src/
+    ./bin/notebookgen -s 11 -c 3 -p a4paper -a "BUET Beggar Bros - Bangladesh University of Engineering and Technology" ./../src/
 
 For more details and source project see: https://github.com/pin3da/notebook-generator

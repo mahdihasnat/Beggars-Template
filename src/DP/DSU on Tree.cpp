@@ -1,111 +1,81 @@
-#include<bits/stdc++.h>
-#include<math.h>
-#include<vector>
-using namespace std;
-#define MAX 100005
-#define MOD 1000000007
 vector<int> *pvec[MAX];
-vector<int> Graph[MAX];
-int subtree[MAX];
-int color[MAX];
-int color_counter[MAX];
-pair<long long int,int> Info[MAX];
-int Subtree(int node,int parent=-1)
+vector<int> G[MAX];
+int sz[MAX],color[MAX],color_counter[MAX];
+pair<ll,int> Info[MAX];
+int Subtree(int u,int p=-1)
 {
-    subtree[node]=1;
+    sz[u]=1;
     int i;
-    for(i=0; i<Graph[node].size(); i++)
+    for(i=0; i<G[u].size(); i++)
     {
-        if(Graph[node][i]==parent) continue;
-        subtree[node]=subtree[node]+Subtree(Graph[node][i],node);
+        if(G[u][i]==p) continue;
+        sz[u]=sz[u]+sz(G[u][i],u);
     }
-    return subtree[node];
+    return sz[u];
 }
-pair<long long int,int> dfs(int node,int parent=-1,bool keep=false)
+pair<ll,int>dfs(int u,int p=-1,bool keep=false)
 {
     int i,j,k,child,hchild=-1;
-    for(i=0; i<Graph[node].size(); i++)
+    for(i=0; i<G[u].size(); i++)
     {
-        if(Graph[node][i]==parent) continue;
-        if(hchild==-1||subtree[hchild]<subtree[Graph[node][i]])
+        if(G[u][i]==p) continue;
+        if(hchild==-1||sz[hchild]<sz[G[u][i]])
         {
-            hchild=Graph[node][i];
+            hchild=G[u][i];
         }
     }
-    for(i=0; i<Graph[node].size(); i++)
+    for(i=0; i<G[u].size(); i++)
     {
-        if(Graph[node][i]==parent||Graph[node][i]==hchild) continue;
-        dfs(Graph[node][i],node,false);
+        if(G[u][i]==p||G[u][i]==hchild) continue;
+        dfs(G[u][i],u,false);
     }
     if(hchild!=-1)
     {
-        Info[node]=dfs(hchild,node,true);
-        pvec[node]=pvec[hchild];
+        Info[u]=dfs(hchild,u,true);
+        pvec[u]=pvec[hchild];
     }
     else
     {
-        pvec[node]=new vector<int> ();
+        pvec[u]=new vector<int> ();
     }
-    pvec[node]->push_back(node);
-    color_counter[color[node]]++;
-    if(color_counter[color[node]]>Info[node].second)
+    pvec[u]->push_back(u);
+    color_counter[color[u]]++;
+    if(color_counter[color[u]]>Info[u].second)
     {
-        Info[node].second=color_counter[color[node]];
-        Info[node].first=color[node];
+        Info[u].second=color_counter[color[u]];
+        Info[u].first=color[u];
     }
-    else if(color_counter[color[node]]==Info[node].second)
+    else if(color_counter[color[u]]==Info[u].second)
     {
-        Info[node].first=Info[node].first+color[node];
+        Info[u].first=Info[u].first+color[u];
     }
-    for(i=0; i<Graph[node].size(); i++)
+    for(i=0; i<G[u].size(); i++)
     {
-        if(Graph[node][i]==parent||Graph[node][i]==hchild) continue;
-        child=Graph[node][i];
+        if(G[u][i]==p||G[u][i]==hchild) continue;
+        child=G[u][i];
         for(j=0; j<(*pvec[child]).size(); j++)
         {
             k=(*pvec[child])[j];
-            pvec[node]->push_back(k);
+            pvec[u]->push_back(k);
             color_counter[color[k]]++;
-            if(color_counter[color[k]]>Info[node].second)
+            if(color_counter[color[k]]>Info[u].second)
             {
-                Info[node].second=color_counter[color[k]];
-                Info[node].first=color[k];
+                Info[u].second=color_counter[color[k]];
+                Info[u].first=color[k];
             }
-            else if(color_counter[color[k]]==Info[node].second)
+      else if(color_counter[color[k]]==Info[u].second)
             {
-                Info[node].first=Info[node].first+color[k];
+                Info[u].first=Info[u].first+color[k];
             }
         }
     }
     if(!keep)
     {
-        for(j=0; j<(*pvec[node]).size(); j++)
+        for(j=0; j<(*pvec[u]).size(); j++)
         {
-            k=(*pvec[node])[j];
+            k=(*pvec[u])[j];
             color_counter[color[k]]--;
         }
     }
-    return Info[node];
-}
-int main()
-{
-    int n,u,v,i;
-    scanf("%d",&n);
-    for(i=1; i<=n; i++)
-    {
-        scanf("%d",&color[i]);
-    }
-    for(i=1; i<n; i++)
-    {
-        scanf("%d %d",&u,&v);
-        Graph[u].push_back(v);
-        Graph[v].push_back(u);
-    }
-    Subtree(1);
-    dfs(1);
-    for(i=1; i<=n; i++)
-    {
-        printf("%I64d ",Info[i].first);
-    }
-    return 0;
+    return Info[u];
 }
