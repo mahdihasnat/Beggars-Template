@@ -2,17 +2,6 @@ vector<int> *pvec[MAX];
 vector<int> G[MAX];
 int sz[MAX],color[MAX],color_counter[MAX];
 pair<ll,int> Info[MAX];
-int Subtree(int u,int p=-1)
-{
-    sz[u]=1;
-    int i;
-    for(i=0; i<G[u].size(); i++)
-    {
-        if(G[u][i]==p) continue;
-        sz[u]=sz[u]+sz(G[u][i],u);
-    }
-    return sz[u];
-}
 pair<ll,int>dfs(int u,int p=-1,bool keep=false)
 {
     int i,j,k,child,hchild=-1;
