@@ -8,6 +8,7 @@
 		"string_view": "cpp",
 		"regex": "cpp",
 		"hashing": "c",
-		"cmath": "c"
+		"cmath": "c",
+		"vector": "cpp"
 	}
 }

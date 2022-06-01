@@ -11,11 +11,11 @@ Put your code inside src folder
 
 DS
 -----
-CD
+Cendroid decomposition ---
 CHT_Dynamic
 CHT_Linear
 DSU With Rollback + Dynamic Connectivity Offline
-HLD
+HLD 
 Implicit Treap
 Li Chao Tree
 Link Cut Tree
@@ -23,17 +23,18 @@ Persistent Segment Tree
 Queue Undo DS
 Segment Tree
 Sparse Segment Tree
-Sparse Table
+Sparse Table 2d -- 
 Treap
 BIT
 Mo's Algorithm
 Mo's Algorithm with update
 Wavelet Tree
 Ordered Set
-2DBit - Topcoder
+2DBit - Topcoder xxxx
+2Dbit - Hellbent ----
 LCA
 Matrix Expo
-
+DSU Rollback
 
 String
 -----
@@ -51,9 +52,10 @@ Geo
 Pair of intersecting Segment
 Minkowski
 Minimum Perimeter Triangle
-Line Segment Intersection
-Half Plane Intersection
-Convex Hull
+Line Segment Intersection --- 
+Half Plane Intersection 
+Convex Hull -----
+Common Tangent ----
 
 Math
 ----
@@ -61,13 +63,14 @@ Combinatorics
 Discrete Math
 FFT
 Polynomial Algebra
-Linear Sieve
-
+Linear Sieve ----
+Generating All k comb ---
+Gauss Elimination ---- 
 
 Graph
 -----
 SCC
-
+Articulation Vertex
 
 Flow
 ----
