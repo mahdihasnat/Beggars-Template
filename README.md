@@ -49,11 +49,11 @@ Palindromic Tree
 
 Geo
 ---- 
-Pair of intersecting Segment
-Minkowski
-Minimum Perimeter Triangle
+Pair of intersecting Segment ---
+Minkowski ---
+Minimum Perimeter Triangle ----
 Line Segment Intersection --- 
-Half Plane Intersection 
+Half Plane Intersection ---
 Convex Hull -----
 Common Tangent ----
 
