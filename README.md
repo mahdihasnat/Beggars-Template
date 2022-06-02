@@ -19,23 +19,23 @@ zero matrix ----
 DS
 -----
 Cendroid decomposition ---
-CHT_Dynamic
-CHT_Linear
+CHT_Dynamic XXXXXX
+CHT_Linear  XXXXXX
 DSU With Rollback + Dynamic Connectivity Offline xxxx
 HLD cpalgo ---
-Implicit Treap
-Link Cut Tree
-Persistent Segment Tree
-Queue Undo DS
-Segment Tree
-Sparse Segment Tree
-Sparse Table 2d ----
+Implicit Treap ----
+Link Cut Tree XXXXXX
+Persistent Segment Tree XXXXXXXx
+Queue Undo DS XXXXXXX
+Segment Tree  XXXXXX
+Sparse Segment Tree 
+Sparse Table 2d ---- 
 Treap  ------
 
 BIT
 Mo's Algorithm ----
 Mo's Algorithm with update XXXXX
-Wavelet Tree
+Wavelet Tree 
 Ordered Set
 2DBit - Topcoder xxxx
 2Dbit - Hellbent ----
@@ -50,7 +50,7 @@ Suffix Array ----
 Suffix Automation ----
 KMP 
 Aho Corasick --- 
-Z
+Z ---
 Manachar ----
 Palindromic Tree
 
@@ -64,6 +64,11 @@ Half Plane Intersection ---
 Convex Hull -----
 Common Tangent ----
 Vartical Decomposition ----
+Circle Line intersection  ----
+Area of simple polygon ----
+Circle union area -----
+Radial Sweep -----
+
 
 Math
 ----
@@ -80,10 +85,12 @@ Graph
 SCC -----
 SCC + 2sat ------
 Articulation Vertex ---
+Eular Path -hellbent -------
+Bridge Offline cpalgo ------
 
 Flow
 ----
-note
+note -----
 Hungerian ----
 Dinic's Algo -----
 Blossom -------
