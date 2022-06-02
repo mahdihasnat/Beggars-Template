@@ -9,25 +9,32 @@ Put your code inside src folder
 5. If pdf is not being generated , then install texlive correctly 
 
 
+DP
+-----
+Li Chao Tree ----
+Divide and conquer Optimization -----
+zero matrix ----
+
+
 DS
 -----
 Cendroid decomposition ---
 CHT_Dynamic
 CHT_Linear
-DSU With Rollback + Dynamic Connectivity Offline
-HLD 
+DSU With Rollback + Dynamic Connectivity Offline xxxx
+HLD cpalgo ---
 Implicit Treap
-Li Chao Tree
 Link Cut Tree
 Persistent Segment Tree
 Queue Undo DS
 Segment Tree
 Sparse Segment Tree
-Sparse Table 2d -- 
-Treap
+Sparse Table 2d ----
+Treap  ------
+
 BIT
-Mo's Algorithm
-Mo's Algorithm with update
+Mo's Algorithm ----
+Mo's Algorithm with update XXXXX
 Wavelet Tree
 Ordered Set
 2DBit - Topcoder xxxx
@@ -41,7 +48,7 @@ String
 Hashing
 Suffix Array ----
 Suffix Automation ----
-KMP
+KMP 
 Aho Corasick --- 
 Z
 Manachar -- 
@@ -71,8 +78,13 @@ Gauss Elimination ----
 Graph
 -----
 SCC
+SCC + 2sat ------
 Articulation Vertex
 
 Flow
 ----
 note
+Hungerian ----
+Dinic's Algo -----
+Blossom -------
+Maximum Bipertite Matching -----

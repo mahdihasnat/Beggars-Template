@@ -1,5 +1,3 @@
-/***Copied from https://codeforces.com/blog/entry/49402***/
-
 /*
 GETS:
 V->number of vertices
@@ -8,7 +6,8 @@ pair of vertices as edges (vertices are 1..V)
 
 GIVES:
 output of edmonds() is the maximum matching
-match[i] is matched pair of i (-1 if there isn't a matched pair)
+match[i] is matched pair of i
+(-1 if there isn't a matched pair)
  */
 
 #include <bits/stdc++.h>
@@ -75,30 +74,30 @@ void blossom_contraction(int s,int u,int v)
 }
 int find_augmenting_path(int s)
 {
-    memset(inq,0,sizeof(inq));
-    memset(father,-1,sizeof(father));
-    for (int i=0; i<V; i++) base[i]=i;
-    inq[q[qh=qt=0]=s]=true;
-    while (qh<=qt)
-    {
-        int u=q[qh++];
-        for (edge e=adj[u]; e; e=e->n)
-        {
-            int v=e->v;
-            if (base[u]!=base[v]&&match[u]!=v)
-                if ((v==s)||(match[v]!=-1 && father[match[v]]!=-1))
-                    blossom_contraction(s,u,v);
-                else if (father[v]==-1)
-                {
-                    father[v]=u;
-                    if (match[v]==-1)
-                        return v;
-                    else if (!inq[match[v]])
-                        inq[q[++qt]=match[v]]=true;
-                }
-        }
-    }
-    return -1;
+	memset(inq,0,sizeof(inq));
+	memset(father,-1,sizeof(father));
+	for (int i=0; i<V; i++) base[i]=i;
+	inq[q[qh=qt=0]=s]=true;
+	while (qh<=qt)
+	{
+		int u=q[qh++];
+		for (edge e=adj[u]; e; e=e->n)
+		{
+			int v=e->v;
+			if (base[u]!=base[v]&&match[u]!=v)
+				if((v==s)||(match[v]!=-1 && father[match[v]]!=-1))
+						blossom_contraction(s,u,v);
+				else if (father[v]==-1)
+				{
+					father[v]=u;
+					if (match[v]==-1)
+							return v;
+					else if (!inq[match[v]])
+							inq[q[++qt]=match[v]]=true;
+				}
+		}
+	}
+	return -1;
 }
 int augment_path(int s,int t)
 {
@@ -115,23 +114,17 @@ int augment_path(int s,int t)
 }
 int edmonds()
 {
-    int matchc=0;
-    memset(match,-1,sizeof(match));
-    for (int u=0; u<V; u++)
-        if (match[u]==-1)
-            matchc+=augment_path(u,find_augmenting_path(u));
-    return matchc;
+	int matchc=0;
+	memset(match,-1,sizeof(match));
+	for (int u=0; u<V; u++)
+		if (match[u]==-1)
+				matchc+=augment_path(u,find_augmenting_path(u));
+	return matchc;
 }
-int main()
-{
-    FILE *in=stdin;
-    int u,v;
+int main(){
     fscanf(in,"%d",&V);
-    while(fscanf(in,"%d %d",&u,&v)!=EOF)
-    {
-
-        if (!ed[u-1][v-1])
-        {
+    while(fscanf(in,"%d %d",&u,&v)!=EOF){
+        if (!ed[u-1][v-1]){
             add_edge(u-1,v-1);
             ed[u-1][v-1]=ed[v-1][u-1]=true;
         }
@@ -140,5 +133,4 @@ int main()
     for (int i=0; i<V; i++)
         if (i<match[i])
             printf("%d %d\n",i+1,match[i]+1);
-    return 0;
 }
