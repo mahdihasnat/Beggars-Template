@@ -56,6 +56,7 @@ Line Segment Intersection ---
 Half Plane Intersection ---
 Convex Hull -----
 Common Tangent ----
+Vartical Decomposition ----
 
 Math
 ----
