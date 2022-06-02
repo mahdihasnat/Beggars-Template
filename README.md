@@ -39,8 +39,8 @@ DSU Rollback
 String
 -----
 Hashing
-Suffix Array
-Suffix Automata
+Suffix Array ----
+Suffix Automation ----
 KMP
 Aho Corasick
 Z
@@ -60,7 +60,7 @@ Vartical Decomposition ----
 
 Math
 ----
-Combinatorics
+Combinatorics xxxx
 Discrete Math  ---
 FFT ----
 Polynomial Algebra ---
