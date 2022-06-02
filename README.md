@@ -61,9 +61,9 @@ Vartical Decomposition ----
 Math
 ----
 Combinatorics
-Discrete Math
-FFT
-Polynomial Algebra
+Discrete Math  ---
+FFT ----
+Polynomial Algebra ---
 Linear Sieve ----
 Generating All k comb ---
 Gauss Elimination ---- 
