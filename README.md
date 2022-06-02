@@ -45,13 +45,13 @@ DSU Rollback
 
 String
 -----
-Hashing
+Hashing ------
 Suffix Array ----
 Suffix Automation ----
 KMP 
 Aho Corasick --- 
 Z
-Manachar -- 
+Manachar ----
 Palindromic Tree
 
 Geo
@@ -77,9 +77,9 @@ Gauss Elimination ----
 
 Graph
 -----
-SCC
+SCC -----
 SCC + 2sat ------
-Articulation Vertex
+Articulation Vertex ---
 
 Flow
 ----
@@ -88,3 +88,4 @@ Hungerian ----
 Dinic's Algo -----
 Blossom -------
 Maximum Bipertite Matching -----
+Min Cost Max Flow ----
