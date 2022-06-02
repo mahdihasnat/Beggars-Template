@@ -42,9 +42,9 @@ Hashing
 Suffix Array ----
 Suffix Automation ----
 KMP
-Aho Corasick
+Aho Corasick --- 
 Z
-Manachar
+Manachar -- 
 Palindromic Tree
 
 Geo
